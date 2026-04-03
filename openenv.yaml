@@ -4,7 +4,7 @@ description: >
   A multi-task OpenEnv benchmark environment simulating real-world customer
   support ticket resolution workflows with classification, response generation,
   and multi-turn conversation management.
-author: your-hf-username
+author: krishnakumar19
 license: MIT
 tags:
   - openenv

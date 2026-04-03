@@ -1,0 +1,31 @@
+# Python cache and build artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.coverage
+
+# Virtual environments
+.venv/
+.venv311/
+env/
+
+# IDE/editor
+.vscode/
+.idea/
+
+# Local environment and secrets
+.env
+.env.*
+
+# Data artifacts
+/data/tickets/raw/
+/data/tickets/processed/
+
+# OS files
+.DS_Store
+Thumbs.db

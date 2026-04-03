@@ -1,7 +1,9 @@
 from __future__ import annotations
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
+import uvicorn
 from server.routes import router
 
 app = FastAPI(title="CustomerSupportEnv", description="OpenEnv-compliant benchmark", version="1.0.0")
@@ -14,3 +16,13 @@ async def root():
 
 @app.get("/health")
 async def health(): return {"status": "ok", "env": "customer_support_env"}
+
+
+def main() -> None:
+	host = os.getenv("HOST", "0.0.0.0")
+	port = int(os.getenv("PORT", "7860"))
+	uvicorn.run("server.app:app", host=host, port=port)
+
+
+if __name__ == "__main__":
+	main()

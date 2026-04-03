@@ -1,3 +1,10 @@
+---
+title: Customer Support Env
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # CustomerSupportEnv
 
 CustomerSupportEnv is an OpenEnv-style benchmark for evaluating AI agents on customer support ticket workflows.

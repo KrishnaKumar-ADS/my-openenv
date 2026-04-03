@@ -9,7 +9,8 @@ router = APIRouter()
 DEFAULT_SESSION = "default"
 
 @router.post("/reset", response_model=ResetResponse)
-async def reset(request: ResetRequest, req: Request):
+async def reset(req: Request, request: ResetRequest | None = None):
+    request = request or ResetRequest()
     session_id = req.headers.get("X-Session-Id", DEFAULT_SESSION)
     env = session_manager.create(session_id, task=request.task, seed=request.seed)
     obs = env.reset(task=request.task, seed=request.seed)

@@ -7,3 +7,7 @@ class TaskMedium:
     def grade(self, response: str, expected: str, step_count: int) -> float:
         return self._grader.grade(response, expected, step_count)
     def is_success(self, score: float) -> bool: return score >= self.SUCCESS_THRESHOLD
+
+def grade_medium(response: str, expected: str, step_count: int) -> float:
+    """Module-level grader entrypoint for manifest-based validators."""
+    return TaskMedium().grade(response, expected, step_count)

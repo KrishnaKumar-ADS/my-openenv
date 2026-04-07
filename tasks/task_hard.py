@@ -8,3 +8,15 @@ class TaskHard:
     def grade(self, responses: List[str], expected: str, final_action: str, should_escalate: bool, step_count: int) -> float:
         return self._grader.grade(responses, expected, final_action, should_escalate, step_count)
     def is_success(self, score: float) -> bool: return score >= self.SUCCESS_THRESHOLD
+
+def grade_hard(
+    responses: List[str],
+    expected: str,
+    final_action: str,
+    should_escalate: bool,
+    step_count: int,
+) -> float:
+    """Module-level grader entrypoint for manifest-based validators."""
+    return TaskHard().grade(
+        responses, expected, final_action, should_escalate, step_count
+    )

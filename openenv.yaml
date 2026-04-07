@@ -44,14 +44,17 @@ tasks:
     name: "Ticket Classification"
     max_steps: 3
     success_threshold: 0.5
+    grader: tasks.task_easy:grade_easy
   - id: medium
     name: "Response Generation"
     max_steps: 5
     success_threshold: 0.5
+    grader: tasks.task_medium:grade_medium
   - id: hard
     name: "Full Multi-Turn Resolution"
     max_steps: 10
     success_threshold: 0.5
+    grader: tasks.task_hard:grade_hard
 benchmarks:
   - id: customer_support_env
     tasks: [easy, medium, hard]

@@ -15,10 +15,9 @@ class EasyGrader:
         true_label = true_label.strip().lower()
         if predicted == true_label: base = 1.0
         elif predicted in self.ADJACENT.get(true_label, []): base = 0.3
-        else: base = -0.5
-        # Preserve negative scores to penalize incorrect classifications.
+        else: base = 0.0
         score = base - (step_count - 1) * 0.05
-        return round(score, 4)
+        return round(min(max(score, 0.0), 1.0), 4)
 
 class MediumGrader:
     def grade(self, response: str, expected: str, step_count: int) -> float:

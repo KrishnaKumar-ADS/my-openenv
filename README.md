@@ -37,6 +37,21 @@ The environment supports three task tiers:
 2. Docker Desktop optional
 3. Bash optional for shell scripts
 
+## Environment Variables (Mandatory)
+
+Define these variables in your environment configuration before running `inference.py`:
+
+1. `API_BASE_URL` - API endpoint for the LLM provider.
+2. `MODEL_NAME` - model identifier to use for inference.
+3. `HF_TOKEN` - Hugging Face/API key.
+
+Optional runtime variables:
+
+1. `CS_ENV_URL` - environment server URL (default: `http://localhost:7860`).
+2. `TASK_NAME` - one of `easy`, `medium`, `hard`.
+3. `MAX_STEPS` - max rollout steps.
+4. `TEMPERATURE` - LLM temperature.
+
 ## Quick Start (Windows PowerShell)
 
 ```bash

@@ -15,7 +15,7 @@ async def root():
 	return RedirectResponse(url="/docs")
 
 @app.get("/health")
-async def health(): return {"status": "ok", "env": "customer_support_env"}
+async def health(): return {"status": "healthy", "env": "customer_support_env"}
 
 
 def main() -> None:

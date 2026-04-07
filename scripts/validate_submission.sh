@@ -58,8 +58,21 @@ else
 fi
 
 echo "[CHECK 3] openenv validate ..."
+OPENENV_CMD=""
 if command -v openenv &> /dev/null; then
-	if openenv validate "$REPO_DIR/openenv.yaml" > /dev/null 2>&1; then
+	OPENENV_CMD="openenv"
+elif [ -x "$REPO_DIR/.venv311/Scripts/openenv.exe" ]; then
+	OPENENV_CMD="$REPO_DIR/.venv311/Scripts/openenv.exe"
+elif [ -x "$REPO_DIR/.venv/Scripts/openenv.exe" ]; then
+	OPENENV_CMD="$REPO_DIR/.venv/Scripts/openenv.exe"
+elif [ -x "$REPO_DIR/../.venv311/Scripts/openenv.exe" ]; then
+	OPENENV_CMD="$REPO_DIR/../.venv311/Scripts/openenv.exe"
+elif [ -x "$REPO_DIR/../.venv/Scripts/openenv.exe" ]; then
+	OPENENV_CMD="$REPO_DIR/../.venv/Scripts/openenv.exe"
+fi
+
+if [ -n "$OPENENV_CMD" ]; then
+	if "$OPENENV_CMD" validate "$REPO_DIR" > /dev/null 2>&1; then
 		echo "  [OK] openenv validate passed"
 		PASSED=$((PASSED+1))
 	else

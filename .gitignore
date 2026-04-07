@@ -20,6 +20,7 @@ __pycache__/
 # Local environment and secrets
 .env
 .env.*
+!.env.example
 
 # Data artifacts
 /data/tickets/raw/

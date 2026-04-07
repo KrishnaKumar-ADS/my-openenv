@@ -6,7 +6,7 @@ from server.app import app
 async def test_health():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         r = await client.get("/health")
-    assert r.status_code == 200 and r.json()["status"] == "ok"
+    assert r.status_code == 200 and r.json()["status"] == "healthy"
 
 @pytest.mark.asyncio
 async def test_reset_easy():

@@ -1,39 +1,45 @@
 from __future__ import annotations
 import uuid
-from pathlib import Path
 from fastapi import APIRouter, HTTPException, Request
-import yaml
 from env.models import ActionModel, ActionType, ObservationModel, FullStateModel
 from server.schemas import ResetRequest, ResetResponse, StateResponse, StepRequest, StepResponse
 from server.session import session_manager
 
 router = APIRouter()
 DEFAULT_SESSION = "default"
+TASKS_METADATA = [
+    {
+        "id": "easy",
+        "name": "Ticket Classification",
+        "max_steps": 3,
+        "success_threshold": 0.5,
+        "grader": "tasks.task_easy:grader",
+    },
+    {
+        "id": "medium",
+        "name": "Response Generation",
+        "max_steps": 5,
+        "success_threshold": 0.5,
+        "grader": "tasks.task_medium:grader",
+    },
+    {
+        "id": "hard",
+        "name": "Full Multi-Turn Resolution",
+        "max_steps": 10,
+        "success_threshold": 0.5,
+        "grader": "tasks.task_hard:grader",
+    },
+]
 
 
-def _load_tasks_from_manifest() -> list[dict]:
-    """Return task definitions with grader entrypoints from openenv.yaml."""
-    manifest_path = Path(__file__).resolve().parents[1] / "openenv.yaml"
-    try:
-        with manifest_path.open("r", encoding="utf-8") as f:
-            manifest = yaml.safe_load(f) or {}
-        tasks = manifest.get("tasks", [])
-        if isinstance(tasks, list):
-            return [t for t in tasks if isinstance(t, dict)]
-    except Exception:
-        pass
-
-    # Fallback keeps metadata validator-compatible if manifest parsing fails.
-    return [
-        {"id": "easy", "grader": "tasks.task_easy:grade_easy"},
-        {"id": "medium", "grader": "tasks.task_medium:grade_medium"},
-        {"id": "hard", "grader": "tasks.task_hard:grade_hard"},
-    ]
+def _metadata_tasks() -> list[dict]:
+    # Return a copy so response serialization cannot mutate module state.
+    return [dict(task) for task in TASKS_METADATA]
 
 
 @router.get("/metadata")
 async def metadata():
-    tasks = _load_tasks_from_manifest()
+    tasks = _metadata_tasks()
     return {
         "name": "customer-support-env",
         "description": "OpenEnv benchmark for customer support ticket workflows.",

@@ -73,12 +73,14 @@ def run_episode(task: str) -> None:
             
             step_resp = _post(f"{CS_ENV_URL}/step", action)
             obs, reward, done = step_resp["observation"], step_resp["reward"], step_resp["done"]
+            step_error = step_resp.get("info", {}).get("last_action_error")
             step_num += 1; rewards.append(reward)
             
             action_log = action["action_type"]
             if action.get("content"): action_log += f":{action['content'][:30]}"
-            log_step(step=step_num, action=action_log, reward=reward, done=done)
+            log_step(step=step_num, action=action_log, reward=reward, done=done, error=step_error)
         score = round(sum(rewards) / len(rewards), 4) if rewards else 0.0
+        score = min(max(score, 0.0), 1.0)
         success = score >= 0.5
     except Exception as exc:
         print(f"[ERROR] Episode failed: {exc}", file=sys.stderr)

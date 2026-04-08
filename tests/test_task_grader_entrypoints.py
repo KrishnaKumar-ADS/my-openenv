@@ -45,3 +45,40 @@ def test_each_task_grader_is_callable_and_bounded():
         checked += 1
 
     assert checked >= 3
+
+
+def test_grader_entrypoints_tolerate_generic_validator_inputs():
+    manifest = _load_manifest()
+    tasks = manifest.get("tasks", [])
+
+    checked = 0
+    sample_payload = {
+        "prediction": "billing",
+        "true_label": "billing",
+        "response": "Thanks for reaching out. We can help with this issue.",
+        "expected": "Thanks for reaching out. We can help with this issue.",
+        "responses": ["Thanks for reaching out."],
+        "final_action": "close_ticket",
+        "should_escalate": False,
+        "step_count": 1,
+    }
+
+    for task in tasks:
+        if not isinstance(task, dict):
+            continue
+        grader_ep = task.get("grader")
+        if not grader_ep:
+            continue
+
+        grader_fn = _resolve_entrypoint(grader_ep)
+
+        score_no_args = float(grader_fn())
+        score_dict_arg = float(grader_fn(sample_payload))
+        score_noisy_args = float(grader_fn("x", "x", 1, "ignored", sample_payload))
+
+        assert 0.0 <= score_no_args <= 1.0
+        assert 0.0 <= score_dict_arg <= 1.0
+        assert 0.0 <= score_noisy_args <= 1.0
+        checked += 1
+
+    assert checked >= 3

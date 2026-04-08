@@ -31,3 +31,4 @@ async def test_metadata_exposes_three_task_graders():
     tasks = payload.get("tasks", [])
     tasks_with_graders = [t for t in tasks if isinstance(t, dict) and t.get("grader")]
     assert len(tasks_with_graders) >= 3
+    assert all(str(task["grader"]).endswith(":grader") for task in tasks_with_graders)

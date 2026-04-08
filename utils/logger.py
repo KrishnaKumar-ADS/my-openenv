@@ -22,5 +22,5 @@ def log_step(step: int, action: str, reward: float, done: bool, error: Optional[
 
 def log_end(success: bool, steps: int, score: float, rewards: List[float]) -> None:
     success_str = "true" if success else "false"
-    rewards_str = ",".join(str(r) for r in rewards)
+    rewards_str = ",".join(str(r) for r in rewards) if rewards else "0.0"
     print(f"[END] success={success_str} steps={steps} score={score} rewards={rewards_str}", flush=True)

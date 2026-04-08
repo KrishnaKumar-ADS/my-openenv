@@ -55,11 +55,11 @@ def _parse_args() -> argparse.Namespace:
 def run_episode(task: str) -> None:
     rewards, step_num, history = [], 0, []
     success, score, category = False, 0.0, "general"
+    model_slug = MODEL_NAME.split("/")[-1]
+    log_start(task=task, env=CS_ENV_BENCHMARK, model=model_slug)
     try:
         reset_resp = _post(f"{CS_ENV_URL}/reset", {"task": task})
         obs, done = reset_resp["observation"], reset_resp.get("done", False)
-        model_slug = MODEL_NAME.split("/")[-1]
-        log_start(task=task, env=CS_ENV_BENCHMARK, model=model_slug)
         while not done and step_num < MAX_STEPS:
             ticket_text, conv_history = obs["ticket_text"], obs.get("conversation_history", [])
             available_actions = obs.get("available_actions", [])

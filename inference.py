@@ -4,15 +4,64 @@ import os
 import sys
 
 import httpx
+from fastapi import FastAPI, Query
 from openai import OpenAI
+from tasks.task_easy import grade_easy as grade_easy_logic
+from tasks.task_hard import grade_hard as grade_hard_logic
+from tasks.task_medium import grade_medium as grade_medium_logic
 from utils.config import API_BASE_URL, MODEL_NAME, HF_TOKEN, TASK_NAME, CS_ENV_URL, CS_ENV_BENCHMARK, MAX_STEPS, TEMPERATURE, VALID_CATEGORIES
 from utils.logger import log_start, log_step, log_end
 
 client = OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN or "no-key")
+app = FastAPI(title="Customer Support Grader API")
 
 CLASSIFY_SYSTEM = "You are a customer support ticket classifier. Output ONLY one of these labels: billing, technical, refund, account, general"
 RESPOND_SYSTEM = "You are a professional support agent. Write a helpful reply (2-4 sentences). Acknowledge issue, provide next step. Do NOT use [INSERT] or <TODO>."
 DECISION_SYSTEM = "Decide if ticket should be escalated or closed. Output EXACTLY one word: escalate OR close"
+
+
+def _bounded_score(value: float) -> float:
+    return round(min(max(float(value), 0.01), 0.99), 4)
+
+
+@app.get("/grade/task_easy")
+def grade_easy(
+    predicted: str = Query("general"),
+    true_label: str = Query("general"),
+    step_count: int = Query(1, ge=1),
+) -> dict[str, float]:
+    score = _bounded_score(grade_easy_logic(predicted=predicted, true_label=true_label, step_count=step_count))
+    return {"score": score, "reward": score}
+
+
+@app.get("/grade/task_medium")
+def grade_medium(
+    response: str = Query("Thank you for reaching out. We are reviewing your request and will update you shortly."),
+    expected: str = Query("Thank you for reaching out. We are reviewing your request and will update you shortly."),
+    step_count: int = Query(1, ge=1),
+) -> dict[str, float]:
+    score = _bounded_score(grade_medium_logic(response=response, expected=expected, step_count=step_count))
+    return {"score": score, "reward": score}
+
+
+@app.get("/grade/task_hard")
+def grade_hard(
+    response: str = Query("I understand your concern and have started reviewing this ticket."),
+    expected: str = Query("I understand your concern and have started reviewing this ticket."),
+    final_action: str = Query("close_ticket"),
+    should_escalate: bool = Query(False),
+    step_count: int = Query(1, ge=1),
+) -> dict[str, float]:
+    score = _bounded_score(
+        grade_hard_logic(
+            responses=[response],
+            expected=expected,
+            final_action=final_action,
+            should_escalate=should_escalate,
+            step_count=step_count,
+        )
+    )
+    return {"score": score, "reward": score}
 
 def _call_llm(system: str, user: str) -> str:
     response = client.chat.completions.create(model=MODEL_NAME, temperature=TEMPERATURE, max_tokens=300, messages=[{"role": "system", "content": system}, {"role": "user", "content": user}])

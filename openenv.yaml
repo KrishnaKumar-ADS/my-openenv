@@ -1,67 +1,17 @@
 spec_version: 1
 name: customer-support-env
 version: "1.0.0"
-description: >
-  A multi-task OpenEnv benchmark environment simulating real-world customer
-  support ticket resolution workflows with classification, response generation,
-  and multi-turn conversation management.
-author: krishnakumar19
-license: MIT
 type: space
 runtime: fastapi
-app: server.app:app
+app: inference:app
 port: 7860
-tags:
-  - openenv
-  - customer-support
-  - nlp
-  - multi-turn
-environment:
-  type: text
-  class: CustomerSupportEnv
-  module: env.customer_support_env
-  max_steps: 10
-  deterministic: true
-endpoints:
-  reset: POST /reset
-  step:  POST /step
-  state: GET  /state
-observation_space:
-  type: object
-  properties:
-    ticket_text:          { type: string }
-    conversation_history: { type: array, items: { type: string } }
-    last_agent_action:    { type: string, nullable: true }
-    status:               { type: string, enum: [open, classified, responding, resolved, escalated] }
-    step_count:           { type: integer, minimum: 0, maximum: 10 }
-    ticket_id:            { type: string }
-    priority:             { type: string, enum: [low, medium, high, urgent] }
-    timestamp:            { type: string }
-    available_actions:    { type: array, items: { type: string } }
-    sentiment_hint:       { type: string, enum: [positive, neutral, negative, angry] }
-action_space:
-  type: object
-  properties:
-    action_type: { type: string, enum: [classify_ticket, respond_to_customer, escalate_ticket, close_ticket] }
-    content:     { type: string, nullable: true }
 tasks:
-  - id: easy
-    name: "Ticket Classification"
-    max_steps: 3
-    success_threshold: 0.5
-    grader: tasks.task_easy:grader
-  - id: medium
-    name: "Response Generation"
-    max_steps: 5
-    success_threshold: 0.5
-    grader: tasks.task_medium:grader
-  - id: hard
-    name: "Full Multi-Turn Resolution"
-    max_steps: 10
-    success_threshold: 0.5
-    grader: tasks.task_hard:grader
-benchmarks:
-  - id: customer_support_env
-    tasks: [easy, medium, hard]
-    reward_range: [0.0, 1.0]
-    evaluation_episodes: 100
+  - id: task_easy
+    difficulty: easy
+    grader: grade/task_easy
+  - id: task_medium
+    difficulty: medium
+    grader: grade/task_medium
+  - id: task_hard
+    difficulty: hard
+    grader: grade/task_hard

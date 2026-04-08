@@ -1,6 +1,8 @@
 from __future__ import annotations
 import uuid
+from pathlib import Path
 from fastapi import APIRouter, HTTPException, Request
+import yaml
 from env.models import ActionModel, ActionType, ObservationModel, FullStateModel
 from server.schemas import ResetRequest, ResetResponse, StateResponse, StepRequest, StepResponse
 from server.session import session_manager
@@ -9,11 +11,33 @@ router = APIRouter()
 DEFAULT_SESSION = "default"
 
 
+def _load_tasks_from_manifest() -> list[dict]:
+    """Return task definitions with grader entrypoints from openenv.yaml."""
+    manifest_path = Path(__file__).resolve().parents[1] / "openenv.yaml"
+    try:
+        with manifest_path.open("r", encoding="utf-8") as f:
+            manifest = yaml.safe_load(f) or {}
+        tasks = manifest.get("tasks", [])
+        if isinstance(tasks, list):
+            return [t for t in tasks if isinstance(t, dict)]
+    except Exception:
+        pass
+
+    # Fallback keeps metadata validator-compatible if manifest parsing fails.
+    return [
+        {"id": "easy", "grader": "tasks.task_easy:grade_easy"},
+        {"id": "medium", "grader": "tasks.task_medium:grade_medium"},
+        {"id": "hard", "grader": "tasks.task_hard:grade_hard"},
+    ]
+
+
 @router.get("/metadata")
 async def metadata():
+    tasks = _load_tasks_from_manifest()
     return {
         "name": "customer-support-env",
         "description": "OpenEnv benchmark for customer support ticket workflows.",
+        "tasks": tasks,
     }
 
 

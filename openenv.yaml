@@ -1,3 +1,4 @@
+spec_version: 1
 name: customer-support-env
 version: "1.0.0"
 description: >
@@ -6,6 +7,10 @@ description: >
   and multi-turn conversation management.
 author: krishnakumar19
 license: MIT
+type: space
+runtime: fastapi
+app: server.app:app
+port: 7860
 tags:
   - openenv
   - customer-support
@@ -44,17 +49,17 @@ tasks:
     name: "Ticket Classification"
     max_steps: 3
     success_threshold: 0.5
-    grader: tasks.task_easy:grade_easy
+    grader: tasks.task_easy:grader
   - id: medium
     name: "Response Generation"
     max_steps: 5
     success_threshold: 0.5
-    grader: tasks.task_medium:grade_medium
+    grader: tasks.task_medium:grader
   - id: hard
     name: "Full Multi-Turn Resolution"
     max_steps: 10
     success_threshold: 0.5
-    grader: tasks.task_hard:grade_hard
+    grader: tasks.task_hard:grader
 benchmarks:
   - id: customer_support_env
     tasks: [easy, medium, hard]
